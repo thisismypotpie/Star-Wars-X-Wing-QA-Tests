@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+//using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
 using System.Linq;
@@ -55,11 +55,16 @@ namespace Star_Wars_X_Wing_QA_Testing
             does_alert_exist = CheckIfAlertExists();
             if(does_alert_exist == false)
             {
-
+                Assert.Fail("No alert message was present");
+            }
+            else if(driver.SwitchTo().Alert().Text != "You must have at least one team created before starting the game.")
+            {
+                Assert.Fail("The incorrect alert was displayed.");
             }
             else
             {
-
+                System.Threading.Thread.Sleep(1000);
+                driver.SwitchTo().Alert().Accept();
             }
         }
         [Test]
