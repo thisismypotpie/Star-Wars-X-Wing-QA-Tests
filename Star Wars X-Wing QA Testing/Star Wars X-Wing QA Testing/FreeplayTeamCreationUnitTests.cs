@@ -14,7 +14,7 @@ namespace Star_Wars_X_Wing_QA_Testing
     class TeamCreationUnitTests
     {
         IWebDriver driver;
-
+        int freeplayTeamNumber = 1;
 
         [OneTimeSetUp]
         public void Setup()
@@ -45,6 +45,12 @@ namespace Star_Wars_X_Wing_QA_Testing
             }
         }
 
+        public int getRandomNumber(int low, int high)
+        {
+            Random rnd = new Random();
+            return rnd.Next(low, high);
+        }
+
         [Test]
         //This test is to confirm that when a player attempts to start a game wtih no teams that an error message shows up.
         public void ConfirmStartGameWarningNoTeams()
@@ -67,11 +73,53 @@ namespace Star_Wars_X_Wing_QA_Testing
                 driver.SwitchTo().Alert().Accept();
             }
         }
+
         [Test]
+        //Test if putting no name in the team prompt will result in the correct error.
+        public void ConfirmNoTeamNameEntry()
+        {
+            IWebElement okTeamCreationButton;
+            IWebElement newTeamButton = driver.FindElement(By.Id("new-team-button"));
+            IWebElement closeTeamButton;
+            bool does_alert_exist = false;
+            newTeamButton.Click();
+            okTeamCreationButton = driver.FindElement(By.Id("ok-button"));
+            okTeamCreationButton.Click();
+            does_alert_exist = CheckIfAlertExists();
+            if (does_alert_exist == false)
+            {
+                Assert.Fail("No alert message was present");
+            }
+            else if (driver.SwitchTo().Alert().Text != "team name cannot be only whitespace.")
+            {
+                Assert.Fail("The incorrect alert was displayed.");
+            }
+            else
+            {
+                System.Threading.Thread.Sleep(1000);
+                driver.SwitchTo().Alert().Accept();
+            }
+            closeTeamButton = driver.FindElement(By.Id("close-team-name-button"));
+            closeTeamButton.Click();
+        }
+
+        [Test]
+        //Create a single team with a single ship.
         public void CreateSingleTeamShip()
         {
-            
-        }
+            //Main team screen
+            IWebElement okTeamCreationButton;
+            IWebElement newTeamButton = driver.FindElement(By.Id("new-team-button"));
+            IWebElement teamNameTextField;
+            newTeamButton.Click();
+            okTeamCreationButton = driver.FindElement(By.Id("ok-button"));
+            teamNameTextField = driver.FindElement(By.Id("team-name-input"));
+            teamNameTextField.SendKeys("Test Team "+freeplayTeamNumber);
+            okTeamCreationButton.Click();
+            //Ship selection screen
+            int faction = getRandomNumber(1,3);
+            IWebElement factionClick = driver.FindElement()
+         }
     }
   
 }
