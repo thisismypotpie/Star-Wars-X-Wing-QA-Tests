@@ -11,7 +11,7 @@ using OpenQA.Selenium.Chrome;
 
 namespace Star_Wars_X_Wing_QA_Testing
 {
-    class TeamCreationUnitTests
+    class FreeplayTeamCreationUnitTests
     {
         IWebDriver driver;
         int freeplayTeamNumber = 1;
@@ -19,46 +19,20 @@ namespace Star_Wars_X_Wing_QA_Testing
         [OneTimeSetUp]
         public void Setup()
         {
-            IWebElement new_game_button;
-            IWebElement freeplay_button;
-            driver = new ChromeDriver("C:/Users/Brandon Danielski/Documents/FullStackWebClass/Final-Project/Final-Project-QA-Testing");
-            driver.Url = "file:///C:/Users/Brandon%20Danielski/Documents/FullStackWebClass/Final-Project/Final-Project-Front-End/Front-End-Files/Title-Screen(Main%20Menu)/index.html";
-            driver.Navigate();
-            System.Threading.Thread.Sleep(5000);
-            new_game_button = driver.FindElement(By.Id("new-game-button"));
-            new_game_button.Click();
-            freeplay_button = driver.FindElement(By.Id("freeplay-button"));
-            freeplay_button.Click();
-
+            UtilityFunctions.freeplaySetup(ref driver);
         }
 
-        public bool CheckIfAlertExists()
-        {
-            try
-            {
-                driver.SwitchTo().Alert();
-                return true;
-            }
-            catch (NoAlertPresentException Ex)
-            {
-                return false;
-            }
-        }
-
-        public int getRandomNumber(int low, int high)
-        {
-            Random rnd = new Random();
-            return rnd.Next(low, high);
-        }
+        /*********************************************************MAIN TEAM SCREEN****************************************************************/
 
         [Test]
+        //Boundry Test
         //This test is to confirm that when a player attempts to start a game wtih no teams that an error message shows up.
         public void ConfirmStartGameWarningNoTeams()
         {
             bool does_alert_exist = false;
             IWebElement startGameButton = driver.FindElement(By.Id("start-game-button"));
             startGameButton.Click();
-            does_alert_exist = CheckIfAlertExists();
+            does_alert_exist = UtilityFunctions.CheckIfAlertExists(ref driver);
             if(does_alert_exist == false)
             {
                 Assert.Fail("No alert message was present");
@@ -75,6 +49,7 @@ namespace Star_Wars_X_Wing_QA_Testing
         }
 
         [Test]
+        //Boundry Test
         //Test if putting no name in the team prompt will result in the correct error.
         public void ConfirmNoTeamNameEntry()
         {
@@ -85,7 +60,7 @@ namespace Star_Wars_X_Wing_QA_Testing
             newTeamButton.Click();
             okTeamCreationButton = driver.FindElement(By.Id("ok-button"));
             okTeamCreationButton.Click();
-            does_alert_exist = CheckIfAlertExists();
+            does_alert_exist = UtilityFunctions.CheckIfAlertExists(ref driver);
             if (does_alert_exist == false)
             {
                 Assert.Fail("No alert message was present");
@@ -103,23 +78,9 @@ namespace Star_Wars_X_Wing_QA_Testing
             closeTeamButton.Click();
         }
 
-        [Test]
-        //Create a single team with a single ship.
-        public void CreateSingleTeamShip()
-        {
-            //Main team screen
-            IWebElement okTeamCreationButton;
-            IWebElement newTeamButton = driver.FindElement(By.Id("new-team-button"));
-            IWebElement teamNameTextField;
-            newTeamButton.Click();
-            okTeamCreationButton = driver.FindElement(By.Id("ok-button"));
-            teamNameTextField = driver.FindElement(By.Id("team-name-input"));
-            teamNameTextField.SendKeys("Test Team "+freeplayTeamNumber);
-            okTeamCreationButton.Click();
-            //Ship selection screen
-            int faction = getRandomNumber(1,3);
-            IWebElement factionClick = driver.FindElement()
-         }
+        /*********************************************************SHIP SELECTION SCREEN****************************************************************/
+
+
     }
-  
+
 }
