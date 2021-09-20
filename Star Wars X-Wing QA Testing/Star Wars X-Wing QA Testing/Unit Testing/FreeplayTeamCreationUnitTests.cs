@@ -14,7 +14,6 @@ namespace Star_Wars_X_Wing_QA_Testing
     class FreeplayTeamCreationUnitTests
     {
         IWebDriver driver;
-        int freeplayTeamNumber = 1;
 
         [OneTimeSetUp]
         public void Setup()
@@ -22,7 +21,7 @@ namespace Star_Wars_X_Wing_QA_Testing
             UtilityFunctions.freeplaySetup(ref driver);
         }
 
-        /*********************************************************MAIN TEAM SCREEN****************************************************************/
+        /*********************************************************TEAM SCREEN****************************************************************/
 
         [Test]
         //Boundry Test
@@ -76,6 +75,33 @@ namespace Star_Wars_X_Wing_QA_Testing
             }
             closeTeamButton = driver.FindElement(By.Id("close-team-name-button"));
             closeTeamButton.Click();
+        }
+
+        [Test]
+        //Happy Path Test
+        //Test if going from team screen, to main screen, back to team screen removes all teams.
+        public void TeamRemovalMainScreen()
+        {
+            int number_of_teams = UtilityFunctions.getRandomNumber(1, 5);
+            for(int i=0; i < number_of_teams;i++)
+            {
+                UtilityFunctions.createFreeplayTeam(ref driver);
+            }
+            driver.FindElement(By.Id("back-button")).Click();
+            driver.FindElement(By.Id("new-game-button")).Click();
+            driver.FindElement(By.Id("freeplay-button")).Click();
+            Assert.IsTrue(driver.FindElements(By.ClassName("team-summary")).Count ==0);
+        }
+
+        [Test]
+        //Happy Path Test
+        //Test to confirm that removing a single ship from an existing team works.
+        public void SingleShipRemoval()
+        {
+            UtilityFunctions.SetupFreeplayGame(ref driver);
+            int element_chosen = UtilityFunctions.getRandomNumber(0, driver.FindElements(By.ClassName("team-summary")).Count);
+            int number_of_ships = int.Parse(driver.FindElements(By.ClassName("team-summary"))[element_chosen].FindElement(By.Id("Test Team "+(element_chosen+1)+"-size")).Text);
+            driver.FindElements(By.ClassName("team-summary"))[element_chosen].Click();
         }
 
         /*********************************************************SHIP SELECTION SCREEN****************************************************************/

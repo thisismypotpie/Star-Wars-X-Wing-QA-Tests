@@ -13,6 +13,10 @@ namespace Star_Wars_X_Wing_QA_Testing
 {
     class UtilityFunctions
     {
+        public static int freeplayTeamNumber = 1;//Adds number to end of team name. EX: Test Team 8, Test Team 2, etc.
+        public static List<int> rosterNumbersInUse = new List<int>();
+
+
         public static void freeplaySetup(ref IWebDriver driver)
         {
             IWebElement new_game_button;
@@ -46,7 +50,7 @@ namespace Star_Wars_X_Wing_QA_Testing
             return rnd.Next(low, high);
         }
 
-        public static void createFreeplayTeam(ref IWebDriver driver, ref int freeplayTeamNumber, ref List<int> rosterNumbersInUse)
+        public static void createFreeplayTeam(ref IWebDriver driver)
         {
             //Main team screen
             IWebElement okTeamCreationButton;
@@ -121,14 +125,87 @@ namespace Star_Wars_X_Wing_QA_Testing
             {
                 roster_number = UtilityFunctions.getRandomNumber(1, 999);
             }
+            rosterNumbersInUse.Add(roster_number);
             driver.FindElement(By.Id("roster-number-input")).SendKeys(roster_number.ToString());
             driver.FindElement(By.Id("ok-button")).Click();
             freeplayTeamNumber = driver.FindElements(By.ClassName("team-summary")).Count + 1;
         }
 
-        public static void addShipToExistingTeam()
+        public static void addShipToExistingTeam(ref IWebDriver driver, string name_of_team_to_add)
         {
+            int team_count = driver.FindElements(By.ClassName("team-summary")).Count;
+            driver.FindElement(By.Id(name_of_team_to_add)).Click();
+            driver.FindElement(By.Id("add-button")).Click();
 
+            //Ship selection screen
+            IList<IWebElement> factionList = driver.FindElements(By.ClassName("faction-option"));
+            IList<IWebElement> shipSizeList;
+            IList<IWebElement> shipList;
+            int element_counter = UtilityFunctions.getRandomNumber(0, factionList.Count);
+            factionList[element_counter].Click();
+            shipSizeList = driver.FindElements(By.ClassName("ship-size-option"));
+            element_counter = UtilityFunctions.getRandomNumber(0, shipSizeList.Count);
+            shipSizeList[element_counter].Click();
+            shipList = driver.FindElements(By.ClassName("ship-option"));
+            element_counter = UtilityFunctions.getRandomNumber(0, shipList.Count);
+            shipList[element_counter].Click();
+
+            //Pilot selection screen
+            IWebElement direction_button = null;
+            bool pilot_selected = false;
+            while (pilot_selected == false)
+            {
+                element_counter = UtilityFunctions.getRandomNumber(1, 2);
+                if (element_counter == 1)//Go forward
+                {
+                    direction_button = driver.FindElement(By.Id("next-btn"));
+                }
+                else if (element_counter == 2)//Go backward
+                {
+                    direction_button = driver.FindElement(By.Id("previous-btn"));
+                }
+                else
+                {
+                    Assert.Fail("Pilot Selection screen failed. Random number to determine foward and backward motion returned out of bounds.");
+                }
+                element_counter = UtilityFunctions.getRandomNumber(0, 50);
+                for (int i = 0; i < element_counter; i++)
+                {
+                    direction_button.Click();
+                }
+                if (!driver.FindElement(By.Id("unavailable")).Displayed)
+                {
+                    pilot_selected = true;
+                }
+            }
+            driver.FindElement(By.Id("select-button")).Click();
+
+            //Upgrade selection screen
+            int numberOfUpgrades = UtilityFunctions.getRandomNumber(0, 12);
+            for (int i = 0; i < numberOfUpgrades; i++)
+            {
+                driver.FindElement(By.Id("next-selection")).Click();
+
+                //Upgrade type selection screen
+                IList<IWebElement> upgrade_types = driver.FindElements(By.ClassName("type-clicker"));
+                upgrade_types[UtilityFunctions.getRandomNumber(0, upgrade_types.Count)].Click();
+
+                //Upgrade Options screen
+                IList<IWebElement> upgrades = driver.FindElements(By.ClassName("upgrade"));
+                upgrades[UtilityFunctions.getRandomNumber(0, upgrades.Count)].Click();
+            }
+            driver.FindElement(By.Id("done-button")).Click();
+            int roster_number = UtilityFunctions.getRandomNumber(1, 999);
+            while (rosterNumbersInUse.Contains(roster_number))
+            {
+                roster_number = UtilityFunctions.getRandomNumber(1, 999);
+            }
+            rosterNumbersInUse.Add(roster_number);
+            driver.FindElement(By.Id("roster-number-input")).SendKeys(roster_number.ToString());
+            driver.FindElement(By.Id("ok-button")).Click();
+
+            //Back to team screen
+            Assert.IsTrue(driver.FindElements(By.ClassName("team-summary")).Count == team_count);
         }
 
         public static bool assertPageValidation(string page, string url)
@@ -182,6 +259,21 @@ namespace Star_Wars_X_Wing_QA_Testing
                 return true;
             }
             return false;
+        }
+
+        public static void SetupFreeplayGame(ref IWebDriver driver)
+        {
+            int number_of_teams = UtilityFunctions.getRandomNumber(2, 5);
+            int number_of_ships_per_team = UtilityFunctions.getRandomNumber(1, 5);
+            for (int i = 0; i < number_of_teams; i++)
+            {
+                createFreeplayTeam(ref driver);
+                for(int j=0; j < number_of_ships_per_team;j++)
+                {
+                    addShipToExistingTeam(ref driver, "Test Team " + (freeplayTeamNumber - 1));
+                }
+                number_of_ships_per_team = UtilityFunctions.getRandomNumber(1, 5);
+            }
         }
     }
 }

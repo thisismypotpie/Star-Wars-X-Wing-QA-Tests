@@ -14,8 +14,7 @@ namespace Star_Wars_X_Wing_QA_Testing
     class FreeplayIntegrationTests
     {
         IWebDriver driver;
-        int freeplayTeamNumber = 1;
-        List<int> rosterNumbersInUse = new List<int>();
+        
         [OneTimeSetUp]
         public void Setup()
         {
@@ -34,7 +33,7 @@ namespace Star_Wars_X_Wing_QA_Testing
             newTeamButton.Click();
             okTeamCreationButton = driver.FindElement(By.Id("ok-button"));
             teamNameTextField = driver.FindElement(By.Id("team-name-input"));
-            teamNameTextField.SendKeys("Test Team " + freeplayTeamNumber);
+            teamNameTextField.SendKeys("Test Team " + UtilityFunctions.freeplayTeamNumber);
             okTeamCreationButton.Click();
 
             //Ship selection screen
@@ -102,17 +101,18 @@ namespace Star_Wars_X_Wing_QA_Testing
             }
             driver.FindElement(By.Id("done-button")).Click();
             int roster_number = UtilityFunctions.getRandomNumber(1, 999);
-            while(rosterNumbersInUse.Contains(roster_number))
+            while(UtilityFunctions.rosterNumbersInUse.Contains(roster_number))
             {
                 roster_number = UtilityFunctions.getRandomNumber(1, 999);
             }
+            UtilityFunctions.rosterNumbersInUse.Add(roster_number);
             driver.FindElement(By.Id("roster-number-input")).SendKeys(roster_number.ToString());
             driver.FindElement(By.Id("ok-button")).Click();
 
             //Back to team screen
             Assert.IsTrue(UtilityFunctions.assertPageValidation("Team Page", driver.Url));
             Assert.IsTrue(driver.FindElements(By.ClassName("team-summary")).Count == 1);
-            freeplayTeamNumber = driver.FindElements(By.ClassName("team-summary")).Count + 1;
+            UtilityFunctions.freeplayTeamNumber = driver.FindElements(By.ClassName("team-summary")).Count + 1;
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace Star_Wars_X_Wing_QA_Testing
         //Add a single ship to an already existing team.
         public void addNewShipToExistingTeam()
         {
-            UtilityFunctions.createFreeplayTeam(ref driver, ref freeplayTeamNumber, ref rosterNumbersInUse);
+            UtilityFunctions.createFreeplayTeam(ref driver);
             int team_count = driver.FindElements(By.ClassName("team-summary")).Count;
             driver.FindElement(By.Id("Test Team 1")).Click();
             driver.FindElement(By.Id("add-button")).Click();
@@ -190,17 +190,19 @@ namespace Star_Wars_X_Wing_QA_Testing
             }
             driver.FindElement(By.Id("done-button")).Click();
             int roster_number = UtilityFunctions.getRandomNumber(1, 999);
-            while (rosterNumbersInUse.Contains(roster_number))
+            while (UtilityFunctions.rosterNumbersInUse.Contains(roster_number))
             {
                 roster_number = UtilityFunctions.getRandomNumber(1, 999);
             }
+            UtilityFunctions.rosterNumbersInUse.Add(roster_number);
             driver.FindElement(By.Id("roster-number-input")).SendKeys(roster_number.ToString());
             driver.FindElement(By.Id("ok-button")).Click();
 
             //Back to team screen
             Assert.IsTrue(UtilityFunctions.assertPageValidation("Team Page", driver.Url));
             Assert.IsTrue(driver.FindElements(By.ClassName("team-summary")).Count == team_count);
-            freeplayTeamNumber = driver.FindElements(By.ClassName("team-summary")).Count + 1;
+            UtilityFunctions.freeplayTeamNumber = driver.FindElements(By.ClassName("team-summary")).Count + 1;
         }
+
     }
 }
