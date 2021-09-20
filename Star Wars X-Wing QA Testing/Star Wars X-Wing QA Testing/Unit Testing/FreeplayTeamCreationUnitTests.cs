@@ -95,13 +95,33 @@ namespace Star_Wars_X_Wing_QA_Testing
 
         [Test]
         //Happy Path Test
-        //Test to confirm that removing a single ship from an existing team works.
-        public void SingleShipRemoval()
+        //Test to confirm that removing a single ship from an existing team with more than one ship.
+        public void SingleShipRemovalFromMultiShipTeam()
         {
+            List<int> list_of_rosters = new List<int>();
             UtilityFunctions.SetupFreeplayGame(ref driver);
             int element_chosen = UtilityFunctions.getRandomNumber(0, driver.FindElements(By.ClassName("team-summary")).Count);
-            int number_of_ships = int.Parse(driver.FindElements(By.ClassName("team-summary"))[element_chosen].FindElement(By.Id("Test Team "+(element_chosen+1)+"-size")).Text);
+            int number_of_ships_before = int.Parse(driver.FindElements(By.ClassName("team-summary"))[element_chosen].FindElement(By.Id("Test Team "+(element_chosen+1)+"-size")).Text);
+            int current_roster = 0;
+
             driver.FindElements(By.ClassName("team-summary"))[element_chosen].Click();
+            driver.FindElement(By.Id("remove-button")).Click();
+
+            while(!list_of_rosters.Contains(current_roster))
+            {
+                current_roster = int.Parse(driver.FindElement(By.Id("roster-number-stat")).Text.Remove(0, 1));
+                list_of_rosters.Add(current_roster);
+                driver.FindElement(By.Id("next-button")).Click();
+            }
+
+        }
+
+        [Test]
+        //Happy Path Test
+        //Test to confirm that removing a single ship from a team with one ship will remove the team.
+        public void SingleShipRemovalFromSingleShipTeam()
+        {
+
         }
 
         /*********************************************************SHIP SELECTION SCREEN****************************************************************/
