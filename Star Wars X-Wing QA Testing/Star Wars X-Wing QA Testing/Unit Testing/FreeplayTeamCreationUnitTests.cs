@@ -99,21 +99,72 @@ namespace Star_Wars_X_Wing_QA_Testing
         public void SingleShipRemovalFromMultiShipTeam()
         {
             List<int> list_of_rosters = new List<int>();
-            UtilityFunctions.SetupFreeplayGame(ref driver);
+            UtilityFunctions.createFreeplayTeam(ref driver);
             int element_chosen = UtilityFunctions.getRandomNumber(0, driver.FindElements(By.ClassName("team-summary")).Count);
             int number_of_ships_before = int.Parse(driver.FindElements(By.ClassName("team-summary"))[element_chosen].FindElement(By.Id("Test Team "+(element_chosen+1)+"-size")).Text);
             int current_roster = 0;
+            int number_to_delete_space = 0;
+            int forward_or_backwards = 0;
+            int roster_of_the_deleted = 0;
+            int base_roster = 0;
+            int team_size_after_deletion = 0;
+            IWebElement next_previous_button = null;
+
+            //Create a multi ship team.
+            for(int i=0; i < UtilityFunctions.getRandomNumber(1,4);i++)
+            {
+                UtilityFunctions.addShipToExistingTeam(ref driver, "Test Team 1");
+            }
 
             driver.FindElements(By.ClassName("team-summary"))[element_chosen].Click();
             driver.FindElement(By.Id("remove-button")).Click();
 
-            while(!list_of_rosters.Contains(current_roster))
+            current_roster = int.Parse(driver.FindElement(By.Id("roster-number-stat")).Text.Remove(0, 1));
+            while (!list_of_rosters.Contains(current_roster))
             {
-                current_roster = int.Parse(driver.FindElement(By.Id("roster-number-stat")).Text.Remove(0, 1));
                 list_of_rosters.Add(current_roster);
                 driver.FindElement(By.Id("next-button")).Click();
+                current_roster = int.Parse(driver.FindElement(By.Id("roster-number-stat")).Text.Remove(0, 1));
+            }
+            number_to_delete_space = UtilityFunctions.getRandomNumber(0, (list_of_rosters.Count * 5));
+            forward_or_backwards = UtilityFunctions.getRandomNumber(1, 2);
+            if(forward_or_backwards == 1)
+            {
+                next_previous_button = driver.FindElement(By.Id("next-button"));
+            }
+            else if(forward_or_backwards == 2)
+            {
+                next_previous_button = driver.FindElement(By.Id("prev-button"));
+            }
+            else
+            {
+                Assert.Fail("Could not determine which button to press.");
+            }
+            for(int i=0; i < number_to_delete_space;i++)
+            {
+                next_previous_button.Click();
             }
 
+            roster_of_the_deleted = int.Parse(driver.FindElement(By.Id("roster-number-stat")).Text.Remove(0, 1));
+            driver.FindElement(By.Id("upgrade-button")).Click();
+            Assert.IsTrue(UtilityFunctions.CheckIfAlertExists(ref driver));
+            driver.SwitchTo().Alert().Accept();
+            current_roster = -1;
+            base_roster = int.Parse(driver.FindElement(By.Id("roster-number-stat")).Text.Remove(0, 1)); ;
+            while(current_roster != base_roster)
+            {
+                team_size_after_deletion++;
+                if(current_roster == roster_of_the_deleted || base_roster == roster_of_the_deleted)
+                {
+                    Assert.Fail("Roster number of the deleted detected!");
+                }
+                driver.FindElement(By.Id("next-button")).Click();
+                current_roster = int.Parse(driver.FindElement(By.Id("roster-number-stat")).Text.Remove(0, 1));
+            }
+            //Confirm that the roster number of the removed is not present.
+
+            Assert.IsTrue((team_size_after_deletion+1) == list_of_rosters.Count);
+            driver.FindElement(By.Id("back-button")).Click();
         }
 
         [Test]

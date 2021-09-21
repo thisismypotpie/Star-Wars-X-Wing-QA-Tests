@@ -30,6 +30,7 @@ namespace Star_Wars_X_Wing_QA_Testing
             IWebElement okTeamCreationButton;
             IWebElement newTeamButton = driver.FindElement(By.Id("new-team-button"));
             IWebElement teamNameTextField;
+            int test_at_beginning = driver.FindElements(By.ClassName("team-summary")).Count;
             newTeamButton.Click();
             okTeamCreationButton = driver.FindElement(By.Id("ok-button"));
             teamNameTextField = driver.FindElement(By.Id("team-name-input"));
@@ -111,7 +112,7 @@ namespace Star_Wars_X_Wing_QA_Testing
 
             //Back to team screen
             Assert.IsTrue(UtilityFunctions.assertPageValidation("Team Page", driver.Url));
-            Assert.IsTrue(driver.FindElements(By.ClassName("team-summary")).Count == 1);
+            Assert.IsTrue(driver.FindElements(By.ClassName("team-summary")).Count == (test_at_beginning+1));
             UtilityFunctions.freeplayTeamNumber = driver.FindElements(By.ClassName("team-summary")).Count + 1;
         }
 
