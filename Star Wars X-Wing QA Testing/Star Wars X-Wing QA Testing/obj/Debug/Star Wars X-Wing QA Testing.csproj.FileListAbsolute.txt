@@ -24,3 +24,4 @@ C:\Users\Brandon Danielski\Documents\FullStackWebClass\Final-Project\Final-Proje
 C:\Users\Brandon Danielski\Documents\FullStackWebClass\Final-Project\Final-Project-QA-Testing\Star Wars X-Wing QA Testing\Star Wars X-Wing QA Testing\obj\Debug\Star Wars X-Wing QA Testing.csproj.CopyComplete
 C:\Users\Brandon Danielski\Documents\FullStackWebClass\Final-Project\Final-Project-QA-Testing\Star Wars X-Wing QA Testing\Star Wars X-Wing QA Testing\obj\Debug\Star Wars X-Wing QA Testing.dll
 C:\Users\Brandon Danielski\Documents\FullStackWebClass\Final-Project\Final-Project-QA-Testing\Star Wars X-Wing QA Testing\Star Wars X-Wing QA Testing\obj\Debug\Star Wars X-Wing QA Testing.pdb
+C:\Users\Brandon Danielski\Documents\FullStackWebClass\Final-Project\Final-Project-QA-Testing\Star Wars X-Wing QA Testing\Star Wars X-Wing QA Testing\bin\Debug\Microsoft.TestPlatform.AdapterUtilities.dll
